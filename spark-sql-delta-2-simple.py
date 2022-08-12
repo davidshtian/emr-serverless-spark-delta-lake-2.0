@@ -14,13 +14,12 @@ else:
 # use spark session instead of spark context as the entrypoint
 spark = (
     SparkSession.builder.appName("SparkSQL")
-    .config(
-        "hive.metastore.client.factory.class",
-        "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory",
-    )
+    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     .enableHiveSupport()
     .getOrCreate()
-)                         
+)                       
 
 if output_path:
     # generate random output path for testing
