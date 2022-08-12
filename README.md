@@ -37,6 +37,13 @@ aws emr-serverless start-job-run \
             --conf spark.default.parallelism=1 
             --conf spark.jars=s3://<your-s3-bucket>/delta-core_2.12-2.0.0.jar,s3://<your-s3-bucket>/delta-storage-2.0.0.jar"
         }
+    }' \
+    --configuration-overrides '{
+        "monitoringConfiguration": {
+            "s3MonitoringConfiguration": {
+                "logUri": "s3://<your-s3-bucket>/delta-lake-logs/"
+            }
+        }
     }'
 ```
 4. Check the result in S3 bucket.
