@@ -100,3 +100,72 @@ aws emr-serverless start-job-run \
 ![image](https://user-images.githubusercontent.com/14228056/184355201-20b76e93-5aea-4c69-88e3-eb512e3a859a.png)
 
 > Notes: To allow Athena to query the data, *_symlink_format_manifest* need to be generated. Please refer to [Presto, Trino, and Athena to Delta Lake integration using manifests](https://docs.delta.io/latest/presto-integration.html) for details.
+
+
+## Insert Data into Table in Glue Catalog
+
+1. First upload the script to your S3 bucket.
+
+```
+aws s3 cp ./spark-sql-delta-2-insert-table.py s3://<your-s3-bucket>/scripts/
+```
+
+2. Run the command below to start the job.
+
+```
+aws emr-serverless start-job-run \
+    --application-id <your-emr-serverless-application-id> \
+    --execution-role-arn <your-emr-serverless-role-arn> \
+    --job-driver '{
+        "sparkSubmit": {
+            "entryPoint": "s3://<your-s3-bucket>/scripts/spark-sql-delta-2-insert-table.py",
+            "sparkSubmitParameters": "
+            --conf spark.executor.cores=1 
+            --conf spark.executor.memory=4g 
+            --conf spark.driver.cores=1 
+            --conf spark.driver.memory=4g 
+            --conf spark.executor.instances=1 
+            --conf spark.default.parallelism=1 
+            --conf spark.jars=s3://<your-s3-bucket>/delta-core_2.12-2.0.0.jar,s3://<your-s3-bucket>/delta-storage-2.0.0.jar"
+        }
+    }' \
+    --configuration-overrides '{
+        "monitoringConfiguration": {
+            "s3MonitoringConfiguration": {
+                "logUri": "s3://<your-s3-bucket>/delta-lake-logs/"
+            }
+        }
+    }'
+```
+
+3. Check the result in S3 bucket.
+<img width="1070" alt="image" src="https://user-images.githubusercontent.com/14228056/184358274-1b61d734-4448-4467-8f43-c3c9004d5634.png">
+
+4. Query the data via AWS Athena.
+
+First create table for Athena:
+```
+CREATE EXTERNAL TABLE "default"."deltatb_athena"(
+  `id` int, 
+  `name` string, 
+  `loc` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  's3://<your-s3-bucket>/delta-lake/deltatb/_symlink_format_manifest'
+```
+
+Then query the data.
+```
+SELECT * FROM "default"."deltatb_athena";
+```
+
+<img width="922" alt="image" src="https://user-images.githubusercontent.com/14228056/184358181-bb6c18ba-34ec-4f35-8fad-56b884bf0a14.png">
+
+
+> Notes: To allow Athena to query the data, *_symlink_format_manifest* need to be generated and updated. Please refer to [Presto, Trino, and Athena to Delta Lake integration using manifests](https://docs.delta.io/latest/presto-integration.html) for details.
+
