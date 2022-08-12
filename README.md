@@ -28,7 +28,14 @@ aws emr-serverless start-job-run \
         "sparkSubmit": {
             "entryPoint": "s3://<your-s3-bucket>/scripts/spark-sql-delta-2-simple.py",
             "entryPointArguments": ["s3://<your-s3-bucket>/delta-lake/output"],
-            "sparkSubmitParameters": "--conf spark.executor.cores=1 --conf spark.executor.memory=4g --conf spark.driver.cores=1 --conf spark.driver.memory=4g --conf spark.executor.instances=1 --conf spark.default.parallelism=1 --conf spark.jars=s3://<your-s3-bucket>/delta-core_2.12-2.0.0.jar,s3://<your-s3-bucket>/delta-storage-2.0.0.jar"
+            "sparkSubmitParameters": "
+            --conf spark.executor.cores=1 
+            --conf spark.executor.memory=4g 
+            --conf spark.driver.cores=1 
+            --conf spark.driver.memory=4g 
+            --conf spark.executor.instances=1 
+            --conf spark.default.parallelism=1 
+            --conf spark.jars=s3://<your-s3-bucket>/delta-core_2.12-2.0.0.jar,s3://<your-s3-bucket>/delta-storage-2.0.0.jar"
         }
     }'
 ```
