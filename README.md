@@ -170,5 +170,47 @@ SELECT * FROM "default"."deltatb_athena";
 > Notes: To allow Athena to query the data, *_symlink_format_manifest* need to be generated and updated. Please refer to [Presto, Trino, and Athena to Delta Lake integration using manifests](https://docs.delta.io/latest/presto-integration.html) for details.
 
 ## Upsert Data into Table in Glue Catalog
+1. First upload the script to your S3 bucket.
 
-TBD...
+```
+aws s3 cp ./spark-sql-delta-2-upsert-table.py s3://<your-s3-bucket>/scripts/
+```
+
+2. Run the command below to start the job.
+
+```
+aws emr-serverless start-job-run \
+    --application-id <your-emr-serverless-application-id> \
+    --execution-role-arn <your-emr-serverless-role-arn> \
+    --job-driver '{
+        "sparkSubmit": {
+            "entryPoint": "s3://<your-s3-bucket>/scripts/spark-sql-delta-2-upsert-table.py",
+            "sparkSubmitParameters": "
+            --conf spark.executor.cores=1 
+            --conf spark.executor.memory=4g 
+            --conf spark.driver.cores=1 
+            --conf spark.driver.memory=4g 
+            --conf spark.executor.instances=1 
+            --conf spark.default.parallelism=1 
+            --conf spark.jars=s3://<your-s3-bucket>/delta-core_2.12-2.0.0.jar,s3://<your-s3-bucket>/delta-storage-2.0.0.jar"
+        }
+    }' \
+    --configuration-overrides '{
+        "monitoringConfiguration": {
+            "s3MonitoringConfiguration": {
+                "logUri": "s3://<your-s3-bucket>/delta-lake-logs/"
+            }
+        }
+    }'
+```
+
+3. Check the result in S3 bucket.
+
+<img width="1066" alt="image" src="https://user-images.githubusercontent.com/14228056/184373067-b6f33ec0-ede3-4990-9c72-1a9b326c9825.png">
+
+4. Query the data via AWS Athena.
+
+```
+SELECT * FROM "default"."deltatb_athena";
+```
+<img width="917" alt="image" src="https://user-images.githubusercontent.com/14228056/184373014-7f4861fc-407a-4f3c-a403-d1e1b8ca66c9.png">
