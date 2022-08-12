@@ -2,6 +2,9 @@ from pyspark.sql import SparkSession
 import uuid
 import sys
 
+# init output_path variable
+output_path = None
+
 # get the argument of output path from the emr job parameter
 if len(sys.argv) > 1:
     output_path = sys.argv[1]
