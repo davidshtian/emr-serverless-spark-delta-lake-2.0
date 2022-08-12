@@ -169,3 +169,6 @@ SELECT * FROM "default"."deltatb_athena";
 
 > Notes: To allow Athena to query the data, *_symlink_format_manifest* need to be generated and updated. Please refer to [Presto, Trino, and Athena to Delta Lake integration using manifests](https://docs.delta.io/latest/presto-integration.html) for details.
 
+## Upsert Data into Table in Glue Catalog
+
+TBD...
