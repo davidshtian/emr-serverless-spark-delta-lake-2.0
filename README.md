@@ -214,3 +214,102 @@ aws emr-serverless start-job-run \
 SELECT * FROM "default"."deltatb_athena";
 ```
 <img width="917" alt="image" src="https://user-images.githubusercontent.com/14228056/184373014-7f4861fc-407a-4f3c-a403-d1e1b8ca66c9.png">
+
+## Z-ORDER Data into Table in Glue Catalog
+1. First upload the script to your S3 bucket.
+
+```
+aws s3 cp ./spark-sql-delta-2-zorder-table.py s3://<your-s3-bucket>/scripts/
+```
+
+2. Run the command below to start the job.
+
+```
+aws emr-serverless start-job-run \
+    --application-id <your-emr-serverless-application-id> \
+    --execution-role-arn <your-emr-serverless-role-arn> \
+    --job-driver '{
+        "sparkSubmit": {
+            "entryPoint": "s3://<your-s3-bucket>/scripts/spark-sql-delta-2-zorder-table.py",
+            "sparkSubmitParameters": "
+            --conf spark.executor.cores=1 
+            --conf spark.executor.memory=4g 
+            --conf spark.driver.cores=1 
+            --conf spark.driver.memory=4g 
+            --conf spark.executor.instances=1 
+            --conf spark.default.parallelism=1 
+            --conf spark.jars=s3://<your-s3-bucket>/delta-core_2.12-2.0.0.jar,s3://<your-s3-bucket>/delta-storage-2.0.0.jar"
+        }
+    }' \
+    --configuration-overrides '{
+        "monitoringConfiguration": {
+            "s3MonitoringConfiguration": {
+                "logUri": "s3://<your-s3-bucket>/delta-lake-logs/"
+            }
+        }
+    }'
+```
+
+3. Check the result in S3 bucket.
+
+The files have been optimized and z-ordered, the final file number is optimized to 1 as the test data is quite small. But you can still check the delta log shown as below:
+```
+{
+  "add": {
+    "path": "part-00000-0e8b2e53-360b-4dd1-9b76-e74461999ac7-c000.snappy.parquet",
+    "partitionValues": {},
+    "size": 1020,
+    "modificationTime": 1660391657000,
+    "dataChange": false,
+    "stats": "{\"numRecords\":8,\"minValues\":{\"id\":1,\"name\":\"alice\",\"loc\":\"bj\"},\"maxValues\":{\"id\":8,\"name\":\"tom\",\"loc\":\"sz\"},\"nullCount\":{\"id\":0,\"name\":0,\"loc\":0}}"
+  }
+}
+{
+  "remove": {
+    "path": "part-00000-63e08eef-d894-46de-beb4-6d92647c6e05-c000.snappy.parquet",
+    "deletionTimestamp": 1660391638300,
+    "dataChange": false,
+    "extendedFileMetadata": true,
+    "partitionValues": {},
+    "size": 952
+  }
+}
+{
+  "remove": {
+    "path": "part-00000-07aa290f-d937-45fc-920b-b2e1ad8e8d0a-c000.snappy.parquet",
+    "deletionTimestamp": 1660391638300,
+    "dataChange": false,
+    "extendedFileMetadata": true,
+    "partitionValues": {},
+    "size": 981
+  }
+}
+{
+  "commitInfo": {
+    "timestamp": 1660391659684,
+    "operation": "OPTIMIZE",
+    "operationParameters": {
+      "predicate": "[]",
+      "zOrderBy": "[\"loc\"]"
+    },
+    "readVersion": 4,
+    "isolationLevel": "SnapshotIsolation",
+    "isBlindAppend": false,
+    "operationMetrics": {
+      "numRemovedFiles": "2",
+      "numRemovedBytes": "1933",
+      "p25FileSize": "1020",
+      "minFileSize": "1020",
+      "numAddedFiles": "1",
+      "maxFileSize": "1020",
+      "p75FileSize": "1020",
+      "p50FileSize": "1020",
+      "numAddedBytes": "1020"
+    },
+    "engineInfo": "Apache-Spark/3.2.1-amzn-0 Delta-Lake/2.0.0",
+    "txnId": "1847b6c9-3cf1-4918-b726-968ab91b28aa"
+  }
+}
+```
+
+The operation is commitInfo is "OPTIMIZE" and its parameter shows "zOrderBy": "[\"loc\"]".
