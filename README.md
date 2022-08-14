@@ -1,5 +1,7 @@
 # Delta Lake 2.0 @ AWS EMR Serverless Spark Example 
-This is a quick minimum viable example for Delta Lake 2.0 running on AWS EMR Serverless Spark, as the Delta Lake project announces the availability of 2.0 open source release.
+This is a quick minimum viable example for Delta Lake 2.0 running on AWS EMR Serverless Spark, as the Delta Lake project announces the availability of 2.0 open source release and adds fancy features like Z-Order. 
+
+The example also shows cross data analytics capabilities on AWS by using Athena and Redshift.
 
 > Notes: Supposed you've already configured AWS EMR Serverless Application, please refer to [Getting started with Amazon EMR Serverless
 ](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/getting-started.html) for details.
@@ -313,3 +315,20 @@ The files have been optimized and z-ordered, the final file number is optimized 
 ```
 
 The operation is commitInfo is "OPTIMIZE" and its parameter shows "zOrderBy": "[\"loc\"]".
+
+## Query Data using Redshift Serverless Spectrum (all cool serverless stuff)
+1. Create external schema which maps to the database created before in Athena.
+
+```
+create external schema athena_schema from data catalog 
+database 'default'
+iam_role '<your-redshift-role-arn>'
+region '<your-region>'
+```
+
+2. Run the SQL to query the data.
+
+```
+SELECT * FROM "athena_schema"."deltatb_athena" ORDER BY id;
+```
+<img width="1440" alt="image" src="https://user-images.githubusercontent.com/14228056/184525700-d1bd491f-3479-497b-9113-593c1518e5a3.png">
