@@ -1,4 +1,4 @@
-# Delta Lake 2.0 @ AWS EMR Serverless Spark Example 
+# Delta Lake @ AWS EMR Serverless Spark Example 
 This is a quick minimum viable example for Delta Lake 2.0 running on AWS EMR Serverless Spark, as the Delta Lake project announces the availability of 2.0 open source release and adds fancy features like Z-Order. 
 
 The example also shows cross data analytics capabilities on AWS by using Athena and Redshift.
@@ -533,3 +533,6 @@ D,101,Smith,Bob,13-Mar-17,Dallas
   }
 }
 ```
+
+## CDC Data Handling - All in one (to be updated)
+![Delta-Lake-CDC-All](https://user-images.githubusercontent.com/14228056/184533669-89311be1-5dde-4bd6-b483-3170c76b4ec1.png)
