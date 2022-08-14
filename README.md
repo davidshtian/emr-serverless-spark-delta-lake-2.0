@@ -332,3 +332,204 @@ region '<your-region>'
 SELECT * FROM "athena_schema"."deltatb_athena" ORDER BY id;
 ```
 <img width="1440" alt="image" src="https://user-images.githubusercontent.com/14228056/184525700-d1bd491f-3479-497b-9113-593c1518e5a3.png">
+
+## CDC Data Handling - Batch (to be updated)
+
+![Delta-Lake-CDC-Batch](https://user-images.githubusercontent.com/14228056/184527213-c40cf9a5-26e8-44b1-a7a7-2be0489759dc.png)
+
+[Sample DMS files](https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.S3.html) to be handled:
+```
+I,101,Smith,Bob,4-Jun-14,New York
+U,101,Smith,Bob,8-Oct-15,Los Angeles
+U,101,Smith,Bob,13-Mar-17,Dallas
+D,101,Smith,Bob,13-Mar-17,Dallas
+```
+
+## CDC Data Handling - Streaming (to be updated)
+
+![Delta-Lake-CDC-Streaming](https://user-images.githubusercontent.com/14228056/184527588-cdd3dba6-4cb1-4842-b577-2b1b779fd339.png)
+
+[Sample Debezium stream event](https://debezium.io/documentation/reference/stable/connectors/mysql.html) to be handled:
+```
+{
+  "schema": { 
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "first_name"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "last_name"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "email"
+          }
+        ],
+        "optional": true,
+        "name": "mysql-server-1.inventory.customers.Value", 
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "first_name"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "last_name"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "email"
+          }
+        ],
+        "optional": true,
+        "name": "mysql-server-1.inventory.customers.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "boolean",
+            "optional": true,
+            "default": false,
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "table"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "server_id"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "gtid"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "file"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "pos"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "row"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "thread"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "query"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.mysql.Source", 
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      }
+    ],
+    "optional": false,
+    "name": "mysql-server-1.inventory.customers.Envelope" 
+  },
+  "payload": { 
+    "op": "c", 
+    "ts_ms": 1465491411815, 
+    "before": null, 
+    "after": { 
+      "id": 1004,
+      "first_name": "Anne",
+      "last_name": "Kretchmar",
+      "email": "annek@noanswer.org"
+    },
+    "source": { 
+      "version": "1.9.5.Final",
+      "connector": "mysql",
+      "name": "mysql-server-1",
+      "ts_ms": 0,
+      "snapshot": false,
+      "db": "inventory",
+      "table": "customers",
+      "server_id": 0,
+      "gtid": null,
+      "file": "mysql-bin.000003",
+      "pos": 154,
+      "row": 0,
+      "thread": 7,
+      "query": "INSERT INTO customers (first_name, last_name, email) VALUES ('Anne', 'Kretchmar', 'annek@noanswer.org')"
+    }
+  }
+}
+```
