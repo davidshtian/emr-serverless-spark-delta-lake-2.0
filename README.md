@@ -101,7 +101,7 @@ aws emr-serverless start-job-run \
 
 ![image](https://user-images.githubusercontent.com/14228056/184355201-20b76e93-5aea-4c69-88e3-eb512e3a859a.png)
 
-> Notes: To allow Athena to query the data, *_symlink_format_manifest* need to be generated. Please refer to [Presto, Trino, and Athena to Delta Lake integration using manifests](https://docs.delta.io/latest/presto-integration.html) for details.
+> Notes: To allow Athena to query the data, *_symlink_format_manifest* need to be generated. Please refer to [Presto, Trino, and Athena to Delta Lake integration using manifests](https://docs.delta.io/latest/presto-integration.html) for details. To update manifest file automatically, you could set the table property *delta.compatibility.symlinkFormatManifest.enabled=true*, please refer to [Step 3: Update manifests](https://docs.delta.io/latest/presto-integration.html#-step-3-update-manifests) for details and use *spark-sql-delta-2-alter-table.py*.
 
 
 ## Insert Data into Table in Glue Catalog
