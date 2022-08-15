@@ -359,154 +359,7 @@ D,101,Smith,Bob,13-Mar-17,Dallas
   "schema": { 
     "type": "struct",
     "fields": [
-      {
-        "type": "struct",
-        "fields": [
-          {
-            "type": "int32",
-            "optional": false,
-            "field": "id"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "first_name"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "last_name"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "email"
-          }
-        ],
-        "optional": true,
-        "name": "mysql-server-1.inventory.customers.Value", 
-        "field": "before"
-      },
-      {
-        "type": "struct",
-        "fields": [
-          {
-            "type": "int32",
-            "optional": false,
-            "field": "id"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "first_name"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "last_name"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "email"
-          }
-        ],
-        "optional": true,
-        "name": "mysql-server-1.inventory.customers.Value",
-        "field": "after"
-      },
-      {
-        "type": "struct",
-        "fields": [
-          {
-            "type": "string",
-            "optional": false,
-            "field": "version"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "connector"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "name"
-          },
-          {
-            "type": "int64",
-            "optional": false,
-            "field": "ts_ms"
-          },
-          {
-            "type": "boolean",
-            "optional": true,
-            "default": false,
-            "field": "snapshot"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "db"
-          },
-          {
-            "type": "string",
-            "optional": true,
-            "field": "table"
-          },
-          {
-            "type": "int64",
-            "optional": false,
-            "field": "server_id"
-          },
-          {
-            "type": "string",
-            "optional": true,
-            "field": "gtid"
-          },
-          {
-            "type": "string",
-            "optional": false,
-            "field": "file"
-          },
-          {
-            "type": "int64",
-            "optional": false,
-            "field": "pos"
-          },
-          {
-            "type": "int32",
-            "optional": false,
-            "field": "row"
-          },
-          {
-            "type": "int64",
-            "optional": true,
-            "field": "thread"
-          },
-          {
-            "type": "string",
-            "optional": true,
-            "field": "query"
-          }
-        ],
-        "optional": false,
-        "name": "io.debezium.connector.mysql.Source", 
-        "field": "source"
-      },
-      {
-        "type": "string",
-        "optional": false,
-        "field": "op"
-      },
-      {
-        "type": "int64",
-        "optional": true,
-        "field": "ts_ms"
-      }
-    ],
-    "optional": false,
-    "name": "mysql-server-1.inventory.customers.Envelope" 
+    ...(omitted)
   },
   "payload": { 
     "op": "c", 
@@ -539,4 +392,46 @@ D,101,Smith,Bob,13-Mar-17,Dallas
 ```
 
 ## CDC Data Handling - All in one (to be updated)
+
+Use EMR for both batch and streaming processing jobs:
+
 ![Delta-Lake-CDC-All](https://user-images.githubusercontent.com/14228056/184533669-89311be1-5dde-4bd6-b483-3170c76b4ec1.png)
+
+## CDF Change Data Feed (to be updated)
+
+Delta Lake 2.0+ allows users to capture the delta changes after *delta.enableChangeDataFeed* is enabled. Please refer to the blog [How to Simplify CDC With Delta Lake’s Change Data Feed](https://www.databricks.com/blog/2021/06/09/how-to-simplify-cdc-with-delta-lakes-change-data-feed.html) for more details.
+
+```
+cdf_df = spark.read.format("delta") \
+         .option("readChangeFeed", "true") \
+         .option("startingVersion", 10) \
+         .table("default.deltatb")
+```
+
+And *spark-sql-delta-2-cdf-table.py* is an example for handling the changed part:
+```
+{
+  "id": 17,
+  "name": "opq",
+  "loc": "bj",
+  "_change_type": "insert",
+  "_commit_version": 11,
+  "_commit_timestamp": 4.5375430199729815031898112e+25
+}
+{
+  "id": 18,
+  "name": "rst",
+  "loc": "sz",
+  "_change_type": "insert",
+  "_commit_version": 11,
+  "_commit_timestamp": 4.5375430199729815031898112e+25
+}
+{
+  "id": 19,
+  "name": "uvw",
+  "loc": "sh",
+  "_change_type": "insert",
+  "_commit_version": 11,
+  "_commit_timestamp": 4.5375430199729815031898112e+25
+}
+```
