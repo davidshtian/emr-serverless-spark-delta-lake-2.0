@@ -333,6 +333,10 @@ SELECT * FROM "athena_schema"."deltatb_athena" ORDER BY id;
 ```
 <img width="1440" alt="image" src="https://user-images.githubusercontent.com/14228056/184525700-d1bd491f-3479-497b-9113-593c1518e5a3.png">
 
+## Commit Checkpoints
+By default, the reference implementation creates a checkpoint [every 10 commits](https://github.com/delta-io/delta/blob/master/PROTOCOL.md).
+<img width="1071" alt="image" src="https://user-images.githubusercontent.com/14228056/184568611-fa93bd3a-a21f-43a1-8613-7f6fe72a81a5.png">
+
 ## CDC Data Handling - Batch (to be updated)
 
 ![Delta-Lake-CDC-Batch](https://user-images.githubusercontent.com/14228056/184527213-c40cf9a5-26e8-44b1-a7a7-2be0489759dc.png)
