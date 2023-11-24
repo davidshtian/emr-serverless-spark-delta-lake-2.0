@@ -435,3 +435,5 @@ And *spark-sql-delta-2-cdf-table.py* is an example for handling the changed part
   "_commit_timestamp": 4.5375430199729815031898112e+25
 }
 ```
+
+Note: Remember to inlude parameter enableHiveSupport() in spark session~
